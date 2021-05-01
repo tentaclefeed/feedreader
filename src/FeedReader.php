@@ -5,25 +5,34 @@ namespace Tentaclefeed\Feedreader;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 
 class FeedReader
 {
-    public function discover(string $url): Collection
+    public function discover(string $url): bool|Collection
     {
         $html = $this->fetchUrl($url);
+
+        if ($html === false) {
+            return false;
+        }
 
         return $this->discoverFeedUrls($html);
     }
 
     private function fetchUrl(string $url): bool|string
     {
-        $response = Http::withHeaders([
-            'User-Agent' => 'Tentaclefeed/1.0 AutoDiscovery',
-        ])->get($url);
+        try {
+            $response = Http::withHeaders([
+                'User-Agent' => 'Tentaclefeed/1.0 AutoDiscovery',
+            ])->get($url);
 
-        return $response->ok() ? $response->body() : false;
+            return $response->ok() ? $response->body() : false;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     private function discoverFeedUrls(string $html): Collection
