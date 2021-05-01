@@ -42,9 +42,7 @@ class Explorer
             @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
             $xpath = new DOMXPath($dom);
-            $xpath->registerNamespace("php", "http://php.net/xpath");
-            $xpath->registerPHPFunctions("preg_match");
-            $query = '//*/link[@rel = "alternate" and php:function("preg_match", "~application/(?:rss|atom)+xml~", string(@type)) and @href]';
+            $query = '//*/link[@rel = "alternate" and @href and @type = "application/rss+xml" or @type = "application/atom+xml"]';
             $links = $xpath->query($query);
 
             return collect(iterator_to_array($links))->map(function (DOMElement $element) {
