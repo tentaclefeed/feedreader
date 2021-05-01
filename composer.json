@@ -1,0 +1,31 @@
+{
+    "name": "tentaclefeed/feedreader",
+    "description": "The feed reader of Tentaclefeed",
+    "keywords": ["laravel", "rss", "atom", "feed", "reader"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marc Reichel",
+            "email": "mail@marcreichel.de"
+        }
+    ],
+    "require": {
+        "ext-curl": "*",
+        "ext-dom": "*",
+        "php": "^7.4|^8.0",
+        "illuminate/support": "^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Tentaclefeed\\Feedreader\\FeedreaderServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Tentaclefeed\\Feedreader\\": "src/"
+        }
+    }
+}
