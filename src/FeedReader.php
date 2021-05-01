@@ -30,28 +30,32 @@ class FeedReader
             ])->get($url);
 
             return $response->ok() ? $response->body() : false;
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }
 
     private function discoverFeedUrls(string $html): Collection
     {
-        $dom = new DOMDocument();
-        @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        try {
+            $dom = new DOMDocument();
+            @$dom->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 
-        $xpath = new DOMXPath($dom);
-        $xpath->registerNamespace("php", "http://php.net/xpath");
-        $xpath->registerPHPFunctions("preg_match");
-        $query = '//*/link[@rel = "alternate" and php:function("preg_match", "~application/(?:rss|atom)+xml~", string(@type)) and @href]';
-        $links = $xpath->query($query);
+            $xpath = new DOMXPath($dom);
+            $xpath->registerNamespace("php", "http://php.net/xpath");
+            $xpath->registerPHPFunctions("preg_match");
+            $query = '//*/link[@rel = "alternate" and php:function("preg_match", "~application/(?:rss|atom)+xml~", string(@type)) and @href]';
+            $links = $xpath->query($query);
 
-        return collect(iterator_to_array($links))->map(function(DOMElement $element) {
-            return [
-                'title' => $element->getAttribute('title'),
-                'type' => $element->getAttribute('type'),
-                'href' => $element->getAttribute('href'),
-            ];
-        });
+            return collect(iterator_to_array($links))->map(function(DOMElement $element) {
+                return [
+                    'title' => $element->getAttribute('title'),
+                    'type' => $element->getAttribute('type'),
+                    'href' => $element->getAttribute('href'),
+                ];
+            });
+        } catch (Exception) {
+            return new Collection();
+        }
     }
 }
