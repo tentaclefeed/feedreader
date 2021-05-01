@@ -12,7 +12,7 @@ class FeedreaderServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         App::bind('tentaclefeedreader', function() {
             return new FeedReader();
@@ -24,7 +24,7 @@ class FeedreaderServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         //
     }
