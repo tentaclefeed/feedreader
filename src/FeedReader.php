@@ -47,7 +47,7 @@ class FeedReader
             $query = '//*/link[@rel = "alternate" and php:function("preg_match", "~application/(?:rss|atom)+xml~", string(@type)) and @href]';
             $links = $xpath->query($query);
 
-            return collect(iterator_to_array($links))->map(function(DOMElement $element) {
+            return collect(iterator_to_array($links))->map(function (DOMElement $element) {
                 return [
                     'title' => $element->getAttribute('title'),
                     'type' => $element->getAttribute('type'),
