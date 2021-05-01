@@ -12,7 +12,7 @@ class FeedReader
         return (new Explorer())->discover($url);
     }
 
-    public function read(string $url)
+    public function read(string $url): Feed
     {
         return new Feed($url);
     }

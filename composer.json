@@ -1,33 +1,45 @@
 {
-    "name": "tentaclefeed/feedreader",
-    "description": "The feed reader of Tentaclefeed",
-    "keywords": ["laravel", "rss", "atom", "feed", "reader"],
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Marc Reichel",
-            "email": "mail@marcreichel.de"
-        }
-    ],
-    "require": {
-        "ext-curl": "*",
-        "ext-dom": "*",
-        "ext-libxml": "*",
-        "ext-simplexml": "*",
-        "php": "^8.0",
-        "illuminate/support": "^8.0"
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Tentaclefeed\\Feedreader\\FeedreaderServiceProvider"
-            ]
-        }
-    },
-    "autoload": {
-        "psr-4": {
-            "Tentaclefeed\\Feedreader\\": "src/"
-        }
+  "name": "tentaclefeed/feedreader",
+  "description": "A Simple Feed Reader Laravel Package",
+  "keywords": [
+    "rss",
+    "atom",
+    "feed",
+    "reader",
+    "feedreader",
+    "rss-reader",
+    "atom-reader",
+    "laravel",
+    "laravel-package",
+    "php",
+    "php8"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marc Reichel",
+      "email": "mail@marcreichel.de"
     }
+  ],
+  "require": {
+    "ext-curl": "*",
+    "ext-dom": "*",
+    "ext-libxml": "*",
+    "ext-simplexml": "*",
+    "php": "^8.0",
+    "illuminate/support": "^8.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Tentaclefeed\\Feedreader\\FeedreaderServiceProvider"
+      ]
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Tentaclefeed\\Feedreader\\": "src/"
+    }
+  }
 }
