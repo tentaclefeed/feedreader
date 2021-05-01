@@ -13,6 +13,8 @@
     "require": {
         "ext-curl": "*",
         "ext-dom": "*",
+        "ext-libxml": "*",
+        "ext-simplexml": "*",
         "php": "^8.0",
         "illuminate/support": "^8.0"
     },
