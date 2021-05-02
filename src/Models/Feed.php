@@ -3,9 +3,15 @@
 namespace Tentaclefeed\Feedreader\Models;
 
 use Carbon\Carbon;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use SimpleXMLElement;
+use Tentaclefeed\Feedreader\Exceptions\ContentTypeMismatch;
+use Tentaclefeed\Feedreader\Exceptions\FeedNotFoundException;
+use Tentaclefeed\Feedreader\Exceptions\MissingContentTypeException;
+use Tentaclefeed\Feedreader\Exceptions\ParseException;
 
 class Feed
 {
@@ -18,27 +24,11 @@ class Feed
     }
 
     /**
-     * @param string|null $title
-     */
-    public function setTitle(?string $title): void
-    {
-        $this->title = $title;
-    }
-
-    /**
      * @return string|null
      */
     public function getSubtitle(): ?string
     {
         return $this->subtitle;
-    }
-
-    /**
-     * @param string|null $subtitle
-     */
-    public function setSubtitle(?string $subtitle): void
-    {
-        $this->subtitle = $subtitle;
     }
 
     /**
@@ -50,27 +40,11 @@ class Feed
     }
 
     /**
-     * @param Carbon|null $updated_at
-     */
-    public function setUpdatedAt(?Carbon $updated_at): void
-    {
-        $this->updated_at = $updated_at;
-    }
-
-    /**
      * @return Author|null
      */
     public function getAuthor(): ?Author
     {
         return $this->author;
-    }
-
-    /**
-     * @param Author|null $author
-     */
-    public function setAuthor(?Author $author): void
-    {
-        $this->author = $author;
     }
 
     /**
@@ -82,27 +56,11 @@ class Feed
     }
 
     /**
-     * @param string|null $rights
-     */
-    public function setRights(?string $rights): void
-    {
-        $this->rights = $rights;
-    }
-
-    /**
      * @return Collection
      */
     public function getItems(): Collection
     {
         return $this->items;
-    }
-
-    /**
-     * @param Collection $items
-     */
-    public function setItems(Collection $items): void
-    {
-        $this->items = $items;
     }
 
     private string|null $title = null;
@@ -117,34 +75,118 @@ class Feed
 
     private Collection $items;
 
+    /**
+     * @param string $url
+     *
+     * @throws ContentTypeMismatch
+     * @throws FeedNotFoundException
+     * @throws MissingContentTypeException
+     * @throws ParseException
+     */
     public function __construct(string $url)
     {
         $this->init($url);
     }
 
+    /**
+     * @param string $url
+     *
+     * @return void
+     *
+     * @throws MissingContentTypeException
+     * @throws ParseException
+     * @throws ContentTypeMismatch
+     * @throws FeedNotFoundException
+     */
     protected function init(string $url): void
     {
-        try {
-            $response = Http::get($url);
-            $xmlData = $response->body();
-            $xml = simplexml_load_string($xmlData, null, LIBXML_NOCDATA | LIBXML_NOERROR);
+        $response = $this->fetchUrl($url);
 
-            if (!$xml) {
-                return;
-            }
+        $mimeType = $this->getMimeType($response);
 
-            $contentType = optional($response->headers()['Content-Type'])[0];
+        $xml = $this->parseXml($response->body());
 
-            if (!$contentType) {
-                return;
-            }
+        $this->parseFeed($xml, $mimeType);
+    }
 
-            if (preg_match("~application/atom\+xml~", $contentType)) {
-                $this->parseAtom($xml);
-            } elseif (preg_match("~application/rss\+xml~", $contentType)) {
-                $this->parseRss($xml);
-            }
-        } catch (\Exception) {
+    /**
+     * @param string $url
+     *
+     * @return Response
+     *
+     * @throws FeedNotFoundException
+     */
+    protected function fetchUrl(string $url): Response
+    {
+        $response = Http::withHeaders([
+            'User-Agent' => 'Tentaclefeed/1.0 FeedReader',
+        ])->get($url);
+
+        if (!$response->ok()) {
+            throw new FeedNotFoundException();
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param Response $response
+     *
+     * @return string
+     *
+     * @throws ContentTypeMismatch
+     * @throws MissingContentTypeException
+     */
+    protected function getMimeType(Response $response): string
+    {
+        $contentType = $response->header('Content-Type');
+
+        if (!$contentType) {
+            throw new MissingContentTypeException();
+        }
+
+        if (!Str::contains($contentType, 'application/atom+xml') &&
+            !Str::contains($contentType, 'application/rss+xml')) {
+            throw new ContentTypeMismatch();
+        }
+
+        preg_match('~application/(?:atom|rss)\+xml~', $contentType, $matches);
+
+        return $matches[0];
+    }
+
+    /**
+     * @param string $data
+     *
+     * @return SimpleXMLElement
+     *
+     * @throws ParseException
+     */
+    protected function parseXml(string $data): SimpleXMLElement
+    {
+        $xml = simplexml_load_string($data, null, LIBXML_NOCDATA | LIBXML_NOERROR);
+
+        if (!$xml) {
+            throw new ParseException();
+        }
+
+        return $xml;
+    }
+
+    /**
+     * @param SimpleXMLElement $xml
+     * @param string           $mimeType
+     *
+     * @throws ContentTypeMismatch
+     */
+    protected function parseFeed(SimpleXMLElement $xml, string $mimeType): void
+    {
+        if ($mimeType === 'application/atom+xml') {
+            $this->parseAtom($xml);
+        } elseif ($mimeType === 'application/rss+xml') {
+            $this->parseRss($xml);
+        } else {
+            throw new ContentTypeMismatch();
         }
     }
 

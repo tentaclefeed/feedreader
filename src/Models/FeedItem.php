@@ -15,27 +15,11 @@ class FeedItem
     }
 
     /**
-     * @param string $id
-     */
-    public function setId(string $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return string
      */
     public function getTitle(): string
     {
         return $this->title;
-    }
-
-    /**
-     * @param string $title
-     */
-    public function setTitle(string $title): void
-    {
-        $this->title = $title;
     }
 
     /**
@@ -47,14 +31,6 @@ class FeedItem
     }
 
     /**
-     * @param Carbon $created_at
-     */
-    public function setCreatedAt(Carbon $created_at): void
-    {
-        $this->created_at = $created_at;
-    }
-
-    /**
      * @return string
      */
     public function getUrl(): string
@@ -63,27 +39,11 @@ class FeedItem
     }
 
     /**
-     * @param string $url
-     */
-    public function setUrl(string $url): void
-    {
-        $this->url = $url;
-    }
-
-    /**
      * @return string
      */
     public function getSummary(): string
     {
         return $this->summary;
-    }
-
-    /**
-     * @param string $summary
-     */
-    public function setSummary(string $summary): void
-    {
-        $this->summary = $summary;
     }
 
     private string $id;

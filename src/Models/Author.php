@@ -4,9 +4,25 @@ namespace Tentaclefeed\Feedreader\Models;
 
 class Author
 {
-    public string $name;
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
-    public string|null $uri;
+    /**
+     * @return string|null
+     */
+    public function getUri(): ?string
+    {
+        return $this->uri;
+    }
+
+    private string $name;
+
+    private string|null $uri;
 
     public function __construct(string $name, string $uri = null)
     {
