@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+    <channel>
+        <title>Example RSS Feed</title>
+        <link>https://example.com</link>
+        <description>Example RSS Feed Description</description>
+        <language>en-us</language>
+        <copyright>Copyright (c) 2021 Example Company</copyright>
+        <lastBuildDate>Sat, 02 May 2021 00:00:00 +0000</lastBuildDate>
+        <pubDate>Sat, 02 May 2021 00:00:00 +0000</pubDate>
+        <image>
+            <title>Example RSS Feed</title>
+            <url>https://via.placeholder.com/250x40.png</url>
+            <link>https://example.com</link>
+        </image>
+        <item>
+            <title>Example Article #2</title>
+            <link>https://example.com/posts/2</link>
+            <guid isPermaLink="true">https://example.com/posts/2</guid>
+            <description>Example Article #2
+            </description>
+            <pubDate>Sat, 02 May 2021 00:00:00 +0000</pubDate>
+            <category domain="http://example.com/categories/1">Category #1</category>
+            <category domain="http://example.com/categories/2">Category #2</category>
+            <category domain="http://example.com/categories/3">Category #3</category>
+        </item>
+        <item>
+            <title>Example Article #1</title>
+            <link>https://example.com/posts/1</link>
+            <guid isPermaLink="true">https://example.com/posts/1</guid>
+            <description>Example Article #1
+            </description>
+            <pubDate>Sat, 01 May 2021 00:00:00 +0000</pubDate>
+        </item>
+    </channel>
+</rss>

@@ -9,17 +9,113 @@ use SimpleXMLElement;
 
 class Feed
 {
-    public string|null $title = null;
+    /**
+     * @return string|null
+     */
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
 
-    public string|null $subtitle = null;
+    /**
+     * @param string|null $title
+     */
+    public function setTitle(?string $title): void
+    {
+        $this->title = $title;
+    }
 
-    public Carbon|null $updated_at = null;
+    /**
+     * @return string|null
+     */
+    public function getSubtitle(): ?string
+    {
+        return $this->subtitle;
+    }
 
-    public Author|null $author = null;
+    /**
+     * @param string|null $subtitle
+     */
+    public function setSubtitle(?string $subtitle): void
+    {
+        $this->subtitle = $subtitle;
+    }
 
-    public string|null $rights = null;
+    /**
+     * @return Carbon|null
+     */
+    public function getUpdatedAt(): ?Carbon
+    {
+        return $this->updated_at;
+    }
 
-    public Collection $items;
+    /**
+     * @param Carbon|null $updated_at
+     */
+    public function setUpdatedAt(?Carbon $updated_at): void
+    {
+        $this->updated_at = $updated_at;
+    }
+
+    /**
+     * @return Author|null
+     */
+    public function getAuthor(): ?Author
+    {
+        return $this->author;
+    }
+
+    /**
+     * @param Author|null $author
+     */
+    public function setAuthor(?Author $author): void
+    {
+        $this->author = $author;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRights(): ?string
+    {
+        return $this->rights;
+    }
+
+    /**
+     * @param string|null $rights
+     */
+    public function setRights(?string $rights): void
+    {
+        $this->rights = $rights;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getItems(): Collection
+    {
+        return $this->items;
+    }
+
+    /**
+     * @param Collection $items
+     */
+    public function setItems(Collection $items): void
+    {
+        $this->items = $items;
+    }
+
+    private string|null $title = null;
+
+    private string|null $subtitle = null;
+
+    private Carbon|null $updated_at = null;
+
+    private Author|null $author = null;
+
+    private string|null $rights = null;
+
+    private Collection $items;
 
     public function __construct(string $url)
     {
@@ -72,6 +168,7 @@ class Feed
         $this->title = $channel->title;
         $this->subtitle = $channel->description ?? null;
         $this->updated_at = Carbon::parse($channel->lastBuildDate);
+        $this->rights = $channel->copyright ?? null;
         $this->items = new Collection();
         foreach ($channel->item as $item) {
             $this->items->push(

@@ -2,7 +2,6 @@
 
 namespace Tentaclefeed\Feedreader;
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 
 class FeedreaderServiceProvider extends ServiceProvider
@@ -14,7 +13,7 @@ class FeedreaderServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        App::bind('tentaclefeedreader', function() {
+        $this->app->bind('tentaclefeedreader', function () {
             return new FeedReader();
         });
     }

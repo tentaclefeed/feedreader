@@ -2,11 +2,12 @@
 
 namespace Tentaclefeed\Feedreader\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Tentaclefeed\Feedreader\Models\Feed;
 
 /**
- * @method static array discover(string $url)
+ * @method static Collection discover(string $url)
  * @method static Feed read(string $url)
  *
  * @package Tentaclefeed\FeedReader\Facades

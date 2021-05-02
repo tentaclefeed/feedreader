@@ -37,4 +37,16 @@ use Tentaclefeed\Feedreader\Facades\FeedReader;
 $feed = FeedReader::read('https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml');
 ```
 
+## Testing
+
+Run the tests with:
+
+```bash
+composer test
+```
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
+
 [packagist]: https://packagist.org/packages/tentaclefeed/feedreader
