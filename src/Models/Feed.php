@@ -8,9 +8,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use SimpleXMLElement;
-use Tentaclefeed\Feedreader\Exceptions\ContentTypeMismatch;
+use Tentaclefeed\Feedreader\Exceptions\ContentMismatch;
 use Tentaclefeed\Feedreader\Exceptions\FeedNotFoundException;
-use Tentaclefeed\Feedreader\Exceptions\MissingContentTypeException;
 use Tentaclefeed\Feedreader\Exceptions\ParseException;
 
 class Feed
@@ -78,9 +77,8 @@ class Feed
     /**
      * @param string $url
      *
-     * @throws ContentTypeMismatch
+     * @throws ContentMismatch
      * @throws FeedNotFoundException
-     * @throws MissingContentTypeException
      * @throws ParseException
      */
     public function __construct(string $url)
@@ -93,20 +91,17 @@ class Feed
      *
      * @return void
      *
-     * @throws MissingContentTypeException
      * @throws ParseException
-     * @throws ContentTypeMismatch
+     * @throws ContentMismatch
      * @throws FeedNotFoundException
      */
     protected function init(string $url): void
     {
         $response = $this->fetchUrl($url);
 
-        $mimeType = $this->getMimeType($response);
-
         $xml = $this->parseXml($response->body());
 
-        $this->parseFeed($xml, $mimeType);
+        $this->parseFeed($xml);
     }
 
     /**
@@ -130,32 +125,6 @@ class Feed
     }
 
     /**
-     * @param Response $response
-     *
-     * @return string
-     *
-     * @throws ContentTypeMismatch
-     * @throws MissingContentTypeException
-     */
-    protected function getMimeType(Response $response): string
-    {
-        $contentType = $response->header('Content-Type');
-
-        if (!$contentType) {
-            throw new MissingContentTypeException();
-        }
-
-        if (!Str::contains($contentType, 'application/atom+xml') &&
-            !Str::contains($contentType, 'application/rss+xml')) {
-            throw new ContentTypeMismatch();
-        }
-
-        preg_match('~application/(?:atom|rss)\+xml~', $contentType, $matches);
-
-        return $matches[0];
-    }
-
-    /**
      * @param string $data
      *
      * @return SimpleXMLElement
@@ -175,28 +144,39 @@ class Feed
 
     /**
      * @param SimpleXMLElement $xml
-     * @param string           $mimeType
      *
-     * @throws ContentTypeMismatch
+     * @return void
+     *
+     * @throws ContentMismatch
      */
-    protected function parseFeed(SimpleXMLElement $xml, string $mimeType): void
+    protected function parseFeed(SimpleXMLElement $xml): void
     {
-        if ($mimeType === 'application/atom+xml') {
+        $name = strtolower($xml->getName());
+        $namespace = strtolower(collect($xml->getNamespaces())->get(''));
+        $attributes = collect($xml->attributes());
+        if ($name === 'feed' && Str::endsWith($namespace, 'atom')) {
             $this->parseAtom($xml);
-        } elseif ($mimeType === 'application/rss+xml') {
-            $this->parseRss($xml);
+        } elseif (strtolower($name) === 'rss' && (string)$attributes->get('version') === '2.0') {
+            $this->parseRss2($xml);
         } else {
-            throw new ContentTypeMismatch();
+            throw new ContentMismatch();
         }
     }
 
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return void
+     */
     protected function parseAtom(SimpleXMLElement $xml): void
     {
-        $this->title = $xml->title;
-        $this->subtitle = $xml->subtitle ?? null;
-        $this->updated_at = $xml->updated ? Carbon::parse($xml->updated) : null;
-        $this->author = $xml->author ? new Author($xml->author->name, $xml->author->uri) : null;
-        $this->rights = $xml->rights ?? null;
+        $this->setTitle($xml->title);
+        $this->setSubtitle($xml->subtitle ?? null);
+        $this->setUpdatedAt($xml->updated);
+        if ($xml->author) {
+            $this->setAuthor($xml->author->name, $xml->author->uri);
+        }
+        $this->setRights($xml->rights ?? null);
         $this->items = new Collection();
         foreach ($xml->entry as $item) {
             $link = (string)collect($item->link->attributes())->get('href');
@@ -204,18 +184,64 @@ class Feed
         }
     }
 
-    protected function parseRss(SimpleXMLElement $xml): void
+    /**
+     * @param SimpleXMLElement $xml
+     *
+     * @return void
+     */
+    protected function parseRss2(SimpleXMLElement $xml): void
     {
         $channel = $xml->channel;
-        $this->title = $channel->title;
-        $this->subtitle = $channel->description ?? null;
-        $this->updated_at = Carbon::parse($channel->lastBuildDate);
-        $this->rights = $channel->copyright ?? null;
+        $this->setTitle($channel->title);
+        $this->setSubtitle($channel->description ?? null);
+        $this->setUpdatedAt($channel->lastBuildDate);
+        $this->setRights($channel->copyright ?? null);
         $this->items = new Collection();
         foreach ($channel->item as $item) {
             $this->items->push(
                 new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description),
             );
         }
+    }
+
+    /**
+     * @param string|null $title
+     */
+    protected function setTitle(?string $title): void
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @param string|null $subtitle
+     */
+    public function setSubtitle(?string $subtitle): void
+    {
+        $this->subtitle = $subtitle;
+    }
+
+    /**
+     * @param string|null $updated_at
+     */
+    protected function setUpdatedAt(?string $updated_at): void
+    {
+        $this->updated_at = $updated_at ? Carbon::parse($updated_at) : null;
+    }
+
+    /**
+     * @param string      $name
+     * @param string|null $uri
+     */
+    protected function setAuthor(string $name, ?string $uri): void
+    {
+        $this->author = new Author($name, $uri);
+    }
+
+    /**
+     * @param string|null $rights
+     */
+    protected function setRights(?string $rights): void
+    {
+        $this->rights = $rights;
     }
 }

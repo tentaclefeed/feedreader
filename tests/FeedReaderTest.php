@@ -5,9 +5,7 @@ namespace Tentaclefeed\Feedreader\Tests;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
-use Tentaclefeed\Feedreader\Exceptions\ContentTypeMismatch;
 use Tentaclefeed\Feedreader\Exceptions\FeedNotFoundException;
-use Tentaclefeed\Feedreader\Exceptions\MissingContentTypeException;
 use Tentaclefeed\Feedreader\Exceptions\ParseException;
 use Tentaclefeed\Feedreader\Facades\FeedReader;
 use Tentaclefeed\Feedreader\Models\Author;
@@ -47,8 +45,8 @@ class FeedReaderTest extends TestCase
         self::assertEquals('Example ATOM Feed Subtitle', $feed->getSubtitle());
         self::assertInstanceOf(Carbon::class, $feed->getUpdatedAt());
         self::assertInstanceOf(Author::class, $feed->getAuthor());
-        self::assertEquals('John Doe', $feed->getAuthor()->name);
-        self::assertEquals('https://example.com', $feed->getAuthor()->uri);
+        self::assertEquals('John Doe', $feed->getAuthor()->getName());
+        self::assertEquals('https://example.com', $feed->getAuthor()->getUri());
         self::assertEquals('Copyright (c) 2021 Example Company', $feed->getRights());
         self::assertCount(2, $feed->getItems());
     }
@@ -76,17 +74,9 @@ class FeedReaderTest extends TestCase
     }
 
     /** @test */
-    public function it_should_throw_exception_if_url_returns_no_content_type(): void
-    {
-        $this->expectException(MissingContentTypeException::class);
-
-        FeedReader::read('https://github.com/feed');
-    }
-
-    /** @test */
     public function it_should_throw_exception_if_url_returns_wrong_content_type(): void
     {
-        $this->expectException(ContentTypeMismatch::class);
+        $this->expectException(ParseException::class);
 
         FeedReader::read('https://cnn.com/feed');
     }
