@@ -3,7 +3,12 @@
 namespace Tentaclefeed\Feedreader\Tests;
 
 use Carbon\Carbon;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
+use Tentaclefeed\Feedreader\Exceptions\ContentTypeMismatch;
+use Tentaclefeed\Feedreader\Exceptions\FeedNotFoundException;
+use Tentaclefeed\Feedreader\Exceptions\MissingContentTypeException;
+use Tentaclefeed\Feedreader\Exceptions\ParseException;
 use Tentaclefeed\Feedreader\Facades\FeedReader;
 use Tentaclefeed\Feedreader\Models\Author;
 use Tentaclefeed\Feedreader\Models\Feed;
@@ -15,17 +20,25 @@ class FeedReaderTest extends TestCase
         parent::setUp();
 
         Http::fake([
-            'nytimes.com/*' => Http::response(file_get_contents(__DIR__ . '/mocks/atom.xml'), 200, [
+            'nytimes.com/*' => Http::response(file_get_contents(__DIR__ . '/mocks/atom.xml'), Response::HTTP_OK, [
                 'Content-Type' => 'application/atom+xml; charset=UTF-8',
             ]),
-            'theguardian.com/*' => Http::response(file_get_contents(__DIR__ . '/mocks/rss.xml'), 200, [
+            'theguardian.com/*' => Http::response(file_get_contents(__DIR__ . '/mocks/rss.xml'), Response::HTTP_OK, [
                 'Content-Type' => 'application/rss+xml; charset=UTF-8',
+            ]),
+            'example.com/*' => Http::response('Not found', Response::HTTP_NOT_FOUND),
+            'github.com/*' => Http::response(file_get_contents(__DIR__ . '/mocks/atom.xml'), Response::HTTP_OK),
+            'cnn.com/*' => Http::response('Wrong Content Type', Response::HTTP_OK, [
+                'Content-Type' => 'text/html',
+            ]),
+            'google.com/*' => Http::response('No XML Code', Response::HTTP_OK, [
+                'Content-Type' => 'application/atom+xml; charset=UTF-8',
             ]),
         ]);
     }
 
     /** @test */
-    public function it_should_successfully_read_an_atom_feed()
+    public function it_should_successfully_read_an_atom_feed(): void
     {
         $feed = FeedReader::read('https://nytimes.com/atom');
 
@@ -41,7 +54,7 @@ class FeedReaderTest extends TestCase
     }
 
     /** @test */
-    public function it_should_successfully_read_an_rss_feed()
+    public function it_should_successfully_read_an_rss_feed(): void
     {
         $feed = FeedReader::read('https://theguardian.com/rss');
 
@@ -52,5 +65,37 @@ class FeedReaderTest extends TestCase
         self::assertNull($feed->getAuthor());
         self::assertEquals('Copyright (c) 2021 Example Company', $feed->getRights());
         self::assertCount(2, $feed->getItems());
+    }
+
+    /** @test */
+    public function it_should_throw_exception_if_url_returns_http_error(): void
+    {
+        $this->expectException(FeedNotFoundException::class);
+
+        FeedReader::read('https://example.com/feed');
+    }
+
+    /** @test */
+    public function it_should_throw_exception_if_url_returns_no_content_type(): void
+    {
+        $this->expectException(MissingContentTypeException::class);
+
+        FeedReader::read('https://github.com/feed');
+    }
+
+    /** @test */
+    public function it_should_throw_exception_if_url_returns_wrong_content_type(): void
+    {
+        $this->expectException(ContentTypeMismatch::class);
+
+        FeedReader::read('https://cnn.com/feed');
+    }
+
+    /** @test */
+    public function it_should_throw_exception_if_feed_could_not_be_parsed(): void
+    {
+        $this->expectException(ParseException::class);
+
+        FeedReader::read('https://google.com/feed');
     }
 }
