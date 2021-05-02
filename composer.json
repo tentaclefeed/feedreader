@@ -41,7 +41,10 @@
     "laravel": {
       "providers": [
         "Tentaclefeed\\Feedreader\\FeedreaderServiceProvider"
-      ]
+      ],
+      "aliases": {
+        "FeedReader": "Tentaclefeed\\Feedreader\\Facades\\FeedReader"
+      }
     }
   },
   "scripts": {
