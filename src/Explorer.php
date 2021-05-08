@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 
 class Explorer
 {
-    protected string $iconUrl;
+    protected string|null $iconUrl;
 
     public function discover(string $url): bool|Collection
     {

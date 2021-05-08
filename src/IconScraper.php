@@ -32,7 +32,7 @@ class IconScraper
 
         $xpath = new DOMXPath($dom);
 
-        $touchIconQuery = '//*/link[@rel = "apple-touch-icon"]';
+        $touchIconQuery = '//*/link[@rel = "apple-touch-icon" or @rel = "apple-touch-icon-precomposed"]';
         $appleTouchIcons = collect(iterator_to_array($xpath->query($touchIconQuery)));
 
         if ($appleTouchIcons->count()) {
