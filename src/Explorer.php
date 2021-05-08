@@ -11,8 +11,13 @@ use Illuminate\Support\Facades\Http;
 
 class Explorer
 {
+    protected string $iconUrl;
+
     public function discover(string $url): bool|Collection
     {
+        $iconScraper = new IconScraper($url);
+        $this->iconUrl = $iconScraper->scrape();
+
         $html = $this->fetchUrl($url);
 
         if ($html === false) {
@@ -48,6 +53,7 @@ class Explorer
             return collect(iterator_to_array($links))->map(function (DOMElement $element) {
                 return [
                     'title' => $element->getAttribute('title'),
+                    'icon' => $this->iconUrl,
                     'type' => $element->getAttribute('type'),
                     'href' => $element->getAttribute('href'),
                 ];

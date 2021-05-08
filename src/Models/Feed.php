@@ -11,6 +11,7 @@ use SimpleXMLElement;
 use Tentaclefeed\Feedreader\Exceptions\ContentMismatch;
 use Tentaclefeed\Feedreader\Exceptions\FeedNotFoundException;
 use Tentaclefeed\Feedreader\Exceptions\ParseException;
+use Tentaclefeed\Feedreader\IconScraper;
 
 class Feed
 {
@@ -20,6 +21,14 @@ class Feed
     public function getUrl(): string
     {
         return $this->url;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIcon(): string|null
+    {
+        return $this->icon;
     }
 
     /**
@@ -72,6 +81,8 @@ class Feed
 
     private string $url;
 
+    private string|null $icon;
+
     private string|null $title = null;
 
     private string|null $subtitle = null;
@@ -93,6 +104,9 @@ class Feed
      */
     public function __construct(string $url)
     {
+        $iconScraper = new IconScraper($url);
+        $this->icon = $iconScraper->scrape();
+
         $this->init($url);
     }
 
