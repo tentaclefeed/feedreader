@@ -82,7 +82,9 @@ class IconScraper
 
             if ($size) {
                 preg_match('/(\d+)x(\d+)/', $size, $matches);
-                return $matches[1];
+                if (count($matches) >= 2) {
+                    return $matches[1];
+                }
             }
 
             return $size;
