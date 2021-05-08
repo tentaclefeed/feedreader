@@ -41,6 +41,7 @@ class FeedReaderTest extends TestCase
         $feed = FeedReader::read('https://nytimes.com/atom');
 
         self::assertInstanceOf(Feed::class, $feed);
+        self::assertEquals('https://nytimes.com/atom', $feed->getUrl());
         self::assertEquals('Example ATOM Feed', $feed->getTitle());
         self::assertEquals('Example ATOM Feed Subtitle', $feed->getSubtitle());
         self::assertInstanceOf(Carbon::class, $feed->getUpdatedAt());
@@ -57,6 +58,7 @@ class FeedReaderTest extends TestCase
         $feed = FeedReader::read('https://theguardian.com/rss');
 
         self::assertInstanceOf(Feed::class, $feed);
+        self::assertEquals('https://theguardian.com/rss', $feed->getUrl());
         self::assertEquals('Example RSS Feed', $feed->getTitle());
         self::assertEquals('Example RSS Feed Description', $feed->getSubtitle());
         self::assertInstanceOf(Carbon::class, $feed->getUpdatedAt());

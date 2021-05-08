@@ -15,6 +15,14 @@ use Tentaclefeed\Feedreader\Exceptions\ParseException;
 class Feed
 {
     /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
      * @return string|null
      */
     public function getTitle(): ?string
@@ -62,6 +70,8 @@ class Feed
         return $this->items;
     }
 
+    private string $url;
+
     private string|null $title = null;
 
     private string|null $subtitle = null;
@@ -98,6 +108,8 @@ class Feed
     protected function init(string $url): void
     {
         $response = $this->fetchUrl($url);
+
+        $this->url = $url;
 
         $xml = $this->parseXml($response->body());
 
