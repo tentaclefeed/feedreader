@@ -33,6 +33,7 @@ Illuminate\Support\Collection {#491
   #items: array:1 [
     0 => array:3 [
       "title" => "RSS",
+      "icon" => "http://nytimes.com/vi-assets/static-assets/apple-touch-icon-28865b72953380a40aa43318108876cb.png"
       "type" => "application/rss+xml",
       "href" => "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml"
     ]
@@ -52,6 +53,7 @@ $feed = FeedReader::read('https://rss.nytimes.com/services/xml/rss/nyt/HomePage.
 Tentaclefeed\Feedreader\Models\Feed {#430
   -title: "NYT > Top Stories"
   -subtitle: ""
+  -icon: null
   -updated_at: Carbon\Carbon @1619976397 {#485}
   -author: null
   -rights: "Copyright 2021 The New York Times Company"
@@ -97,6 +99,11 @@ Run the tests with:
 ```bash
 composer test
 ```
+
+## TODO
+
+- Add cache options
+- Improve `IconScraper` to recognize more icons
 
 ## License
 
