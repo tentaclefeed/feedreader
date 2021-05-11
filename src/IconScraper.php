@@ -5,6 +5,7 @@ namespace Tentaclefeed\Feedreader;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
@@ -47,20 +48,23 @@ class IconScraper
             return $this->getIconUrl($pngIcons);
         }
 
-        $host = Http::withHeaders([
-            'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
-        ])->get($this->url);
+        try {
+            $host = Http::withHeaders([
+                'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+            ])->get($this->url);
 
-        $url = $host->effectiveUri()->getHost();
+            $url = $this->addProtocol($host->effectiveUri()->getHost());
 
-        $favIcon = Http::withHeaders([
-            'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
-        ])->get($url . '/favicon.ico');
+            $favIcon = Http::withHeaders([
+                'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+            ])->get($url . '/favicon.ico');
 
-        if ($favIcon->ok()) {
-            Image::configure(['driver' => 'imagick']);
-            $image = Image::make($favIcon->body());
-            return $image->encode('data-url');
+            if ($favIcon->ok()) {
+                Image::configure(['driver' => 'imagick']);
+                $image = Image::make($favIcon->effectiveUri());
+                return $image->encode('data-url');
+            }
+        } catch (Exception) {
         }
 
         return null;
