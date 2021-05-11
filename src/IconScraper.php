@@ -7,6 +7,7 @@ use DOMElement;
 use DOMXPath;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Intervention\Image\Facades\Image;
 
 class IconScraper
 {
@@ -44,6 +45,22 @@ class IconScraper
 
         if ($pngIcons->count()) {
             return $this->getIconUrl($pngIcons);
+        }
+
+        $host = Http::withHeaders([
+            'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+        ])->get($this->url);
+
+        $url = $host->effectiveUri()->getHost();
+
+        $favIcon = Http::withHeaders([
+            'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+        ])->get($url . '/favicon.ico');
+
+        if ($favIcon->ok()) {
+            Image::configure(['driver' => 'imagick']);
+            $image = Image::make($favIcon->body());
+            return $image->encode('data-url');
         }
 
         return null;
