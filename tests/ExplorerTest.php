@@ -29,11 +29,13 @@ class ExplorerTest extends TestCase
         self::assertCount(2, $feeds);
         self::assertContains([
             'title' => 'ATOM Feed',
+            'icon' => null,
             'type' => 'application/atom+xml',
             'href' => 'https://example.com/atom',
         ], $feeds);
         self::assertContains([
             'title' => 'RSS Feed',
+            'icon' => null,
             'type' => 'application/rss+xml',
             'href' => 'https://example.com/rss',
         ], $feeds);
@@ -48,11 +50,13 @@ class ExplorerTest extends TestCase
         self::assertCount(1, $feeds);
         self::assertContains([
             'title' => 'ATOM Feed',
+            'icon' => null,
             'type' => 'application/atom+xml',
             'href' => 'https://example.com/atom',
         ], $feeds);
         self::assertNotContains([
             'title' => 'RSS Feed',
+            'icon' => null,
             'type' => 'application/rss+xml',
             'href' => 'https://example.com/rss',
         ], $feeds);
@@ -67,11 +71,13 @@ class ExplorerTest extends TestCase
         self::assertCount(1, $feeds);
         self::assertNotContains([
             'title' => 'ATOM Feed',
+            'icon' => null,
             'type' => 'application/atom+xml',
             'href' => 'https://example.com/atom',
         ], $feeds);
         self::assertContains([
             'title' => 'RSS Feed',
+            'icon' => null,
             'type' => 'application/rss+xml',
             'href' => 'https://example.com/rss',
         ], $feeds);
