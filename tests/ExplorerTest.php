@@ -3,6 +3,7 @@
 namespace Tentaclefeed\Feedreader\Tests;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tentaclefeed\Feedreader\Facades\FeedReader;
 
@@ -90,5 +91,14 @@ class ExplorerTest extends TestCase
 
         self::assertInstanceOf(Collection::class, $feeds);
         self::assertEmpty($feeds);
+    }
+
+    /** @test */
+    public function it_should_cache_explorer_requests(): void
+    {
+        $url = 'https://nytimes.com/';
+        FeedReader::discover('https://nytimes.com/');
+
+        self::assertTrue(Cache::has('tf.fr.ex.' . sha1($url)));
     }
 }

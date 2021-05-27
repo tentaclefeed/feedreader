@@ -4,6 +4,7 @@ namespace Tentaclefeed\Feedreader\Tests;
 
 use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Tentaclefeed\Feedreader\Exceptions\FeedNotFoundException;
 use Tentaclefeed\Feedreader\Exceptions\ParseException;
@@ -89,5 +90,14 @@ class FeedReaderTest extends TestCase
         $this->expectException(ParseException::class);
 
         FeedReader::read('https://google.com/feed');
+    }
+
+    /** @test */
+    public function it_should_cache_feed_requests(): void
+    {
+        $url = 'https://nytimes.com/atom';
+        FeedReader::read('https://nytimes.com/atom');
+
+        self::assertTrue(Cache::has('tf.fr.fr.' . sha1($url)));
     }
 }
