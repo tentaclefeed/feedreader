@@ -19,6 +19,38 @@ composer require tentaclefeed/feedreader
 
 The package will automatically register itself.
 
+## Publish configuration
+
+To publish the FeedReader config file run:
+
+```bash
+php artisan vendor:publish --provider="Tentaclefeed\Feedreader\FeedreaderServiceProvider" --tag="config"
+```
+
+The default config file contains the following:
+
+```php
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Cache configuration
+    |--------------------------------------------------------------------------
+    |
+    | The FeedReader and Explorer can cache requests automatically for you to
+    | increase performance.
+    |
+    */
+    'cache' => [
+        'explorer' => [
+            'seconds' => 86400, // One day
+        ],
+        'reader' => [
+            'seconds' => 1800, // 30 minutes
+        ],
+    ],
+];
+```
+
 ## Usage
 
 ### Discover Feeds
@@ -102,7 +134,6 @@ composer test
 
 ## TODO
 
-- Add cache options
 - Improve `IconScraper` to recognize more icons
 
 ## License

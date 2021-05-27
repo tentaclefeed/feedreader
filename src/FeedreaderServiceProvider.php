@@ -16,6 +16,7 @@ class FeedreaderServiceProvider extends ServiceProvider
         $this->app->bind('tentaclefeedreader', function () {
             return new FeedReader();
         });
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'feedreader');
     }
 
     /**
@@ -25,6 +26,10 @@ class FeedreaderServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/config.php' => config_path('feedreader.php'),
+            ], 'config');
+        }
     }
 }

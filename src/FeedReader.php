@@ -3,22 +3,28 @@
 namespace Tentaclefeed\Feedreader;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Tentaclefeed\Feedreader\Models\Feed;
 
 class FeedReader
 {
     public function discover(string $url): bool|Collection
     {
-        return (new Explorer())->discover($url);
+        $key = 'tf.fr.ex.' . sha1($url);
+        $ttl = config('feedreader.cache.explorer.seconds', 86400);
+
+        return Cache::remember($key, $ttl, function () use ($url) {
+            return (new Explorer())->discover($url);
+        });
     }
 
-    /**
-     * @throws Exceptions\ContentMismatch
-     * @throws Exceptions\FeedNotFoundException
-     * @throws Exceptions\ParseException
-     */
     public function read(string $url): Feed
     {
-        return new Feed($url);
+        $key = 'tf.fr.fr.' . sha1($url);
+        $ttl = config('feedreader.cache.reader.seconds', 1800);
+
+        return Cache::remember($key, $ttl, function () use ($url) {
+            return new Feed($url);
+        });
     }
 }
