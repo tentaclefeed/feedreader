@@ -2,6 +2,7 @@
 
 # Tentaclefeed FeedReader
 
+[![tests](https://github.com/tentaclefeed/feedreader/actions/workflows/tests.yml/badge.svg?event=push)](https://github.com/tentaclefeed/feedreader/actions/workflows/tests.yml)
 [![Packagist Version](https://img.shields.io/packagist/v/tentaclefeed/feedreader?style=flat-square)][packagist]
 [![Packagist Downloads](https://img.shields.io/packagist/dt/tentaclefeed/feedreader?style=flat-square)][packagist]
 [![Gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg?style=flat-square)](https://gitmoji.dev)
