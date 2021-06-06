@@ -65,6 +65,7 @@ class IconScraper
                 return $image->encode('data-url');
             }
         } catch (Exception) {
+            // Icon could not be scraped. Ignoring.
         }
 
         return null;
@@ -72,7 +73,9 @@ class IconScraper
 
     protected function getHost(string $url): string
     {
-        if (!($host = parse_url($this->addProtocol($url), PHP_URL_HOST))) {
+        $host = parse_url($this->addProtocol($url), PHP_URL_HOST);
+
+        if (!$host) {
             return $url;
         }
 

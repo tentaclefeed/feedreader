@@ -15,20 +15,13 @@
     "php8"
   ],
   "type": "library",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Marc Reichel",
-      "email": "mail@marcreichel.de"
-    }
-  ],
   "require": {
+    "php": "^8.0",
     "ext-curl": "*",
     "ext-dom": "*",
     "ext-imagick": "*",
     "ext-libxml": "*",
     "ext-simplexml": "*",
-    "php": "^8.0",
     "illuminate/support": "^8.40",
     "nesbot/carbon": "^2.46.0",
     "guzzlehttp/guzzle": "^7.3",
@@ -39,16 +32,13 @@
     "orchestra/testbench": "^6.0",
     "nunomaduro/collision": "^5.3"
   },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Tentaclefeed\\Feedreader\\FeedreaderServiceProvider"
-      ],
-      "aliases": {
-        "FeedReader": "Tentaclefeed\\Feedreader\\Facades\\FeedReader"
-      }
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Marc Reichel",
+      "email": "mail@marcreichel.de"
     }
-  },
+  ],
   "scripts": {
     "test": "./vendor/bin/testbench package:test"
   },
@@ -60,6 +50,16 @@
   "autoload-dev": {
     "psr-4": {
       "Tentaclefeed\\Feedreader\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Tentaclefeed\\Feedreader\\FeedreaderServiceProvider"
+      ],
+      "aliases": {
+        "FeedReader": "Tentaclefeed\\Feedreader\\Facades\\FeedReader"
+      }
     }
   }
 }
