@@ -3,6 +3,7 @@
 # Tentaclefeed FeedReader
 
 [![tests](https://github.com/tentaclefeed/feedreader/actions/workflows/tests.yml/badge.svg?event=push)](https://github.com/tentaclefeed/feedreader/actions/workflows/tests.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/tentaclefeed/feedreader/badge)](https://www.codefactor.io/repository/github/tentaclefeed/feedreader)
 [![Packagist Version](https://img.shields.io/packagist/v/tentaclefeed/feedreader)][packagist]
 [![Packagist Downloads](https://img.shields.io/packagist/dt/tentaclefeed/feedreader)][packagist]
 [![Gitmoji](https://img.shields.io/badge/gitmoji-%20😜%20😍-FFDD67.svg)](https://gitmoji.dev)
