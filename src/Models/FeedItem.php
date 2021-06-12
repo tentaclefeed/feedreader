@@ -46,6 +46,14 @@ class FeedItem
         return $this->summary;
     }
 
+    /*
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
     private string $id;
 
     private string $title;
@@ -54,19 +62,23 @@ class FeedItem
 
     private string $url;
 
-    private string $summary;
+    private string|null $summary;
+
+    private string|null $content;
 
     public function __construct(
         string $id,
         string $title,
         string $created_at,
         string $url,
-        string $summary,
+        string|null $summary,
+        string|null $content,
     ) {
         $this->id = $id;
         $this->title = $title;
         $this->created_at = Carbon::parse($created_at);
         $this->url = $url;
-        $this->summary = $summary;
+        $this->summary = $summary ?: null;
+        $this->content = $content ?: null;
     }
 }

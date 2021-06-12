@@ -206,7 +206,7 @@ class Feed
         $this->items = new Collection();
         foreach ($xml->entry as $item) {
             $link = (string)collect($item->link->attributes())->get('href');
-            $this->items->push(new FeedItem($item->id, $item->title, $item->published, $link, $item->summary));
+            $this->items->push(new FeedItem($item->id, $item->title, $item->published, $link, $item->summary, $item->content));
         }
     }
 
