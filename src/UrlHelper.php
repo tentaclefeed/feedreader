@@ -18,6 +18,10 @@ class UrlHelper
             return $scheme . '://' . $host . ($port !== null ? ':' . $port : '') . $path;
         }
 
-        return $effectiveUri . $path;
+        if (!preg_match("~^https?://~i", $path)) {
+            return $effectiveUri . $path;
+        }
+
+        return $path;
     }
 }
