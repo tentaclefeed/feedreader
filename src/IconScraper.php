@@ -9,10 +9,12 @@ use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Intervention\Image\Facades\Image;
+use Psr\Http\Message\UriInterface;
 
 class IconScraper
 {
     private string $url;
+    private UriInterface $effectiveUri;
 
     public function __construct(string $url)
     {
@@ -28,6 +30,8 @@ class IconScraper
         if (!$response || !$response->ok()) {
             return false;
         }
+
+        $this->effectiveUri = $response->effectiveUri();
 
         $dom = new DOMDocument();
         @$dom->loadHTML(mb_convert_encoding($response->body(), 'HTML-ENTITIES', 'UTF-8'));
@@ -53,7 +57,7 @@ class IconScraper
                 'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
             ])->get($this->url);
 
-            $url = $this->addProtocol($host->effectiveUri()->getHost());
+            $url = $host->effectiveUri()->getScheme() . '://' . $host->effectiveUri()->getHost();
 
             $favIcon = Http::withHeaders([
                 'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
@@ -90,15 +94,6 @@ class IconScraper
         return $url;
     }
 
-    private function makeAbsoluteUrl(string $path): string
-    {
-        if (!preg_match("~^https?://~i", $path)) {
-            return $this->addProtocol($this->url) . $path;
-        }
-
-        return $this->addProtocol($path);
-    }
-
     private function getIconUrl(Collection $collection): string
     {
         return $collection->sortBy(function (DOMElement $link) {
@@ -113,7 +108,11 @@ class IconScraper
 
             return $size;
         })->map(function (DOMElement $link) {
-            return $this->makeAbsoluteUrl($link->getAttribute('href'));
+            $href = $link->getAttribute('href');
+            if (!preg_match("~^https?://~i", $href)) {
+                return UrlHelper::makeAbsoluteUrl($this->effectiveUri, $href);
+            }
+            return $href;
         })->first();
     }
 }
