@@ -225,7 +225,7 @@ class Feed
         $this->items = new Collection();
         foreach ($channel->item as $item) {
             $this->items->push(
-                new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description),
+                new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description, null),
             );
         }
     }

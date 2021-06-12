@@ -39,17 +39,17 @@ class FeedItem
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getSummary(): string
+    public function getSummary(): string|null
     {
         return $this->summary;
     }
 
     /*
-     * @return string
+     * @return string|null
      */
-    public function getContent(): string
+    public function getContent(): string|null
     {
         return $this->content;
     }
