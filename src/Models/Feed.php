@@ -34,6 +34,14 @@ class Feed
     /**
      * @return string|null
      */
+    public function getIcon(): string|null
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getLogo(): string|null
     {
         return $this->logo;
@@ -90,6 +98,8 @@ class Feed
     private string $url;
 
     private string|null $link;
+
+    private string|null $icon;
 
     private string|null $logo;
 
@@ -205,6 +215,7 @@ class Feed
     {
         $this->setTitle($xml->title);
         $this->setSubtitle($xml->subtitle ?? null);
+        $this->setIcon();
         $this->setLogo(null);
         $this->setUpdatedAt($xml->updated);
         if ($xml->author) {
@@ -227,6 +238,7 @@ class Feed
     {
         $channel = $xml->channel;
         $this->setLink($channel->link);
+        $this->setIcon();
         $this->setLogo($channel->image->url ?? null);
         $this->setTitle($channel->title);
         $this->setSubtitle($channel->description ?? null);
@@ -238,6 +250,12 @@ class Feed
                 new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description, null),
             );
         }
+    }
+
+    protected function setIcon(): void
+    {
+        $iconScraper = new IconScraper($this->url);
+        $this->icon = $iconScraper->scrape();
     }
 
     protected function setLogo(?string $logo): void
