@@ -26,9 +26,17 @@ class Feed
     /**
      * @return string|null
      */
-    public function getIcon(): string|null
+    public function getLink(): string|null
     {
-        return $this->icon;
+        return $this->link;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLogo(): string|null
+    {
+        return $this->logo;
     }
 
     /**
@@ -81,7 +89,9 @@ class Feed
 
     private string $url;
 
-    private string|null $icon;
+    private string|null $link;
+
+    private string|null $logo;
 
     private string|null $title = null;
 
@@ -104,9 +114,6 @@ class Feed
      */
     public function __construct(string $url)
     {
-        $iconScraper = new IconScraper($url);
-        $this->icon = $iconScraper->scrape();
-
         $this->init($url);
     }
 
@@ -198,6 +205,7 @@ class Feed
     {
         $this->setTitle($xml->title);
         $this->setSubtitle($xml->subtitle ?? null);
+        $this->setLogo(null);
         $this->setUpdatedAt($xml->updated);
         if ($xml->author) {
             $this->setAuthor($xml->author->name, $xml->author->uri);
@@ -218,6 +226,8 @@ class Feed
     protected function parseRss2(SimpleXMLElement $xml): void
     {
         $channel = $xml->channel;
+        $this->setLink($channel->link);
+        $this->setLogo($channel->image->url ?? null);
         $this->setTitle($channel->title);
         $this->setSubtitle($channel->description ?? null);
         $this->setUpdatedAt($channel->lastBuildDate);
@@ -228,6 +238,25 @@ class Feed
                 new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description, null),
             );
         }
+    }
+
+    protected function setLogo(?string $logo): void
+    {
+        if (!$logo) {
+            $iconScraper = new IconScraper($this->url);
+            $this->logo = $iconScraper->scrape();
+            return;
+        }
+
+        $this->logo = $logo;
+    }
+
+    /**
+     * @param string|null $link
+     */
+    protected function setLink(?string $link): void
+    {
+        $this->link = $link;
     }
 
     /**
