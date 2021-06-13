@@ -23,53 +23,19 @@ class IconScraper
 
     public function scrape(): string|null
     {
-        $response = Http::withHeaders([
-            'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
-        ])->get($this->url);
+        $icon = $this->scrapeUrl($this->url);
 
-        if (!$response || !$response->ok()) {
-            return false;
+        if ($icon) {
+            return $icon;
         }
 
-        $this->effectiveUri = $response->effectiveUri();
+        $host_names = explode(".", $this->url);
+        $bottom_host_name = $host_names[count($host_names)-2] . "." . $host_names[count($host_names)-1];
 
-        $dom = new DOMDocument();
-        @$dom->loadHTML(mb_convert_encoding($response->body(), 'HTML-ENTITIES', 'UTF-8'));
+        $domainIcon = $this->scrapeUrl($bottom_host_name);
 
-        $xpath = new DOMXPath($dom);
-
-        $touchIconQuery = '//*/link[@rel = "apple-touch-icon" or @rel = "apple-touch-icon-precomposed"]';
-        $appleTouchIcons = collect(iterator_to_array($xpath->query($touchIconQuery)));
-
-        if ($appleTouchIcons->count()) {
-            return $this->getIconUrl($appleTouchIcons);
-        }
-
-        $pngIconQuery = '//*/link[@rel = "icon" and @type = "image/png"]';
-        $pngIcons = collect(iterator_to_array($xpath->query($pngIconQuery)));
-
-        if ($pngIcons->count()) {
-            return $this->getIconUrl($pngIcons);
-        }
-
-        try {
-            $host = Http::withHeaders([
-                'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
-            ])->get($this->url);
-
-            $url = $host->effectiveUri()->getScheme() . '://' . $host->effectiveUri()->getHost();
-
-            $favIcon = Http::withHeaders([
-                'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
-            ])->get($url . '/favicon.ico');
-
-            if ($favIcon->ok()) {
-                Image::configure(['driver' => 'imagick']);
-                $image = Image::make($favIcon->effectiveUri());
-                return $image->encode('data-url');
-            }
-        } catch (Exception) {
-            // Icon could not be scraped. Ignoring.
+        if ($domainIcon) {
+            return $domainIcon;
         }
 
         return null;
@@ -114,5 +80,59 @@ class IconScraper
             }
             return $href;
         })->first();
+    }
+
+    private function scrapeUrl($url): string|bool
+    {
+        $response = Http::withHeaders([
+            'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+        ])->get($url);
+
+        if (!$response || !$response->ok()) {
+            return false;
+        }
+
+        $this->effectiveUri = $response->effectiveUri();
+
+        $dom = new DOMDocument();
+        @$dom->loadHTML(mb_convert_encoding($response->body(), 'HTML-ENTITIES', 'UTF-8'));
+
+        $xpath = new DOMXPath($dom);
+
+        $touchIconQuery = '//*/link[@rel = "apple-touch-icon" or @rel = "apple-touch-icon-precomposed"]';
+        $appleTouchIcons = collect(iterator_to_array($xpath->query($touchIconQuery)));
+
+        if ($appleTouchIcons->count()) {
+            return $this->getIconUrl($appleTouchIcons);
+        }
+
+        $pngIconQuery = '//*/link[@rel = "icon" and @type = "image/png"]';
+        $pngIcons = collect(iterator_to_array($xpath->query($pngIconQuery)));
+
+        if ($pngIcons->count()) {
+            return $this->getIconUrl($pngIcons);
+        }
+
+        try {
+            $host = Http::withHeaders([
+                'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+            ])->get($url);
+
+            $url = $host->effectiveUri()->getScheme() . '://' . $host->effectiveUri()->getHost();
+
+            $favIcon = Http::withHeaders([
+                'User-Agent' => 'Tentaclefeed/1.0 IconScraper',
+            ])->get($url . '/favicon.ico');
+
+            if ($favIcon->ok()) {
+                Image::configure(['driver' => 'imagick']);
+                $image = Image::make($favIcon->effectiveUri());
+                return $image->encode('data-url');
+            }
+        } catch (Exception) {
+            // Icon could not be scraped. Ignoring.
+        }
+
+        return false;
     }
 }
