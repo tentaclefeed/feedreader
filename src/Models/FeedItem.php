@@ -23,6 +23,14 @@ class FeedItem
     }
 
     /**
+     * @return string|null
+     */
+    public function getImageUrl(): string|null
+    {
+        return $this->imageUrl;
+    }
+
+    /**
      * @return Carbon
      */
     public function getCreatedAt(): Carbon
@@ -58,6 +66,8 @@ class FeedItem
 
     private string $title;
 
+    private string|null $imageUrl;
+
     private Carbon $created_at;
 
     private string $url;
@@ -73,6 +83,7 @@ class FeedItem
         string $url,
         string|null $summary,
         string|null $content,
+        string|null $imageUrl = null,
     ) {
         $this->id = $id;
         $this->title = $title;
@@ -80,5 +91,6 @@ class FeedItem
         $this->url = $url;
         $this->summary = $summary ?: null;
         $this->content = $content ?: null;
+        $this->imageUrl = $imageUrl ?: null;
     }
 }

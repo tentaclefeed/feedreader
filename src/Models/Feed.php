@@ -246,8 +246,16 @@ class Feed
         $this->setRights($channel->copyright ?? null);
         $this->items = new Collection();
         foreach ($channel->item as $item) {
+            $image = null;
+            if ($item->enclosure) {
+                $attributes = collect($item->enclosure->attributes());
+                $mimeType = (string) $attributes->get('type');
+                if (Str::startsWith($mimeType, 'image/')) {
+                    $image = (string) $attributes->get('url');
+                }
+            }
             $this->items->push(
-                new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description, null),
+                new FeedItem($item->guid, $item->title, $item->pubDate, $item->link, $item->description, null, $image),
             );
         }
     }
